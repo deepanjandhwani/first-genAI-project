@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/recommendations/places", "destination": "/api/places" },
+    { "source": "/recommendations/query", "destination": "/api/query" }
+  ],
+  "functions": {
+    "api/*.py": { "runtime": "python3.12" }
+  }
+}

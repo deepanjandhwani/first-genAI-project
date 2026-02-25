@@ -1,0 +1,23 @@
+[project]
+name = "first-genai-project"
+version = "0.1.0"
+description = "AI Restaurant Recommendation Service"
+requires-python = ">=3.10"
+dependencies = [
+    "datasets",
+    "fastapi",
+    "groq",
+    "pydantic>=2.0",
+    "python-dotenv",
+    "uvicorn",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "streamlit"]
+
+[project.scripts]
+app = "api.index:app"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["api*", "phase1*", "phase2*", "phase3*", "phase4*", "phase5*"]

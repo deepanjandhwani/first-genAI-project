@@ -55,4 +55,13 @@ If unset, the app uses template explanations and Phase 3 order.
 3. Click **Deploy**. You should see the red **ZOMATO** header and **AI Restaurant Recommendation Platform** form.
 4. If you still see the old UI: in the app’s **Manage app** → **Reboot app**, or confirm the correct branch and that the repo is public. Add `GROQ_API_KEY` in **Secrets** if you use the LLM.
 
+### Deploy on Vercel
+
+Static UI + Python serverless API. See **DEPLOY_VERCEL.md** for full steps. Summary:
+
+- **UI**: `public/index.html` (same as local Zomato UI). **API**: `api/places.py`, `api/query.py` (rewrites map `/recommendations/*` to `/api/*`).
+- Run Phase 1 locally, then **commit** `data/processed/restaurants.db` (do not add it to `.gitignore`) so Vercel has the DB.
+- In Vercel: set **`GROQ_API_KEY`** in Environment Variables for LLM.
+- Deploy: `vercel` from the project root, or connect the repo at [vercel.com](https://vercel.com).
+
 See **ARCHITECTURE.md** for full design and deployment notes.

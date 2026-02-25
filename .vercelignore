@@ -1,0 +1,12 @@
+# Keep serverless bundle smaller; static UI and API code are still deployed
+frontend-next
+frontend
+*.pyc
+__pycache__
+.pytest_cache
+.git
+.streamlit
+streamlit_app.py
+tests
+*.md
+!README.md
