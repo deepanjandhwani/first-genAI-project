@@ -107,9 +107,23 @@ st.markdown(ZOMATO_HEADER, unsafe_allow_html=True)
 st.markdown(ZOMATO_CSS, unsafe_allow_html=True)
 
 # If you see "ZOMATO" in red above and form below (no sidebar), this is the new UI.
-db_path = PROJECT_ROOT / "data" / "processed" / "restaurants.db" / "data" / "processed" / "restaurants.db"
+db_path = PROJECT_ROOT / "data" / "processed" / "restaurants.db"
 places_list = get_places(db_path) if db_path.exists() else []
-place_options = [""] + (places_list if places_list else (["(Run Phase 1 ingestion first)"] if not db_path.exists() else []))
+place_options = [""] + (places_list if places_list else (["(Build database first)"] if not db_path.exists() else []))
+
+# When DB is missing (e.g. on Streamlit Cloud), offer to build it on demand
+if not db_path.exists():
+    st.warning("Database not found. Build it once (downloads from Hugging Face, ~2–5 min) to get recommendations.")
+    if st.button("Build database now"):
+        with st.spinner("Downloading data and building database…"):
+            try:
+                from phase1.ingestion.phase1_ingestion import run_phase1_ingestion
+                run_phase1_ingestion(sqlite_path=str(db_path))
+                st.success("Database ready. Reload the page to select a location and get recommendations.")
+                st.rerun()
+            except Exception as e:
+                st.exception(e)
+    st.stop()
 
 # Form in main area (same order as local UI: PLACE, MAX PRICE, MIN RATING, CUISINES, MAX RESULTS)
 place = st.selectbox(
@@ -155,9 +169,7 @@ use_llm = st.checkbox("Use LLM (Groq) for explanations", value=True, help="Unche
 submitted = st.button("Get AI Recommendations")
 
 if submitted:
-    if not db_path.exists():
-        st.error("Database not found. Run Phase 1 ingestion first: `data/processed/restaurants.db`")
-    elif not place and places_list:
+    if not place and places_list:
         st.error("Please select a location.")
     else:
         with st.spinner("Finding recommendations…"):
