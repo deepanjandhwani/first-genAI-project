@@ -2,6 +2,7 @@
 Streamlit UI for the Restaurant Recommendation pipeline.
 Run: streamlit run streamlit_app.py
 Uses Phase 2 → 3 → 4 (validate preferences, filter+rank, LLM or fallback).
+Styled to match the local Zomato AI Restaurant Recommendation Platform.
 """
 
 import sqlite3
@@ -18,6 +19,31 @@ except ImportError:
     pass
 
 PROJECT_ROOT = Path(__file__).resolve().parent
+
+# Header with INLINE styles so it always shows on Streamlit Cloud (no dependency on global CSS)
+ZOMATO_HEADER = """
+<div style="
+  background: linear-gradient(135deg, #e23744 0%, #c42f3a 100%);
+  color: white;
+  padding: 1.5rem 2rem;
+  text-align: center;
+  box-shadow: 0 4px 14px rgba(226, 55, 68, 0.25);
+  margin: -1rem -1rem 1.5rem -1rem;
+  border-radius: 0;
+">
+  <div style="font-size: 1.85rem; font-weight: 700; letter-spacing: 0.06em;">🍴 ZOMATO</div>
+  <div style="font-size: 0.875rem; margin-top: 0.35rem; font-weight: 500;">AI Restaurant Recommendation Platform</div>
+</div>
+"""
+
+# Extra CSS for form card and button (applies when Streamlit allows it)
+ZOMATO_CSS = """
+<style>
+  div[data-testid="stVerticalBlock"] > div:has(> div[data-testid="stSelectbox"]) { background: #fff; padding: 1.5rem; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 1rem; }
+  .stButton > button { background: linear-gradient(135deg, #e23744 0%, #c42f3a 100%) !important; color: white !important; border: none !important; border-radius: 999px !important; font-weight: 600 !important; }
+  label { text-transform: uppercase !important; font-size: 0.7rem !important; color: #71717a !important; letter-spacing: 0.06em !important; }
+</style>
+"""
 
 
 def get_places(db_path: Path) -> list[str]:
@@ -70,44 +96,63 @@ def run_recommendations(
 
 
 st.set_page_config(
-    page_title="Restaurant Recommendations",
-    page_icon="🍽️",
-    layout="wide",
+    page_title="Zomato AI · Restaurant Recommendations",
+    page_icon="🍴",
+    layout="centered",
+    initial_sidebar_state="collapsed",
 )
 
-st.title("🍽️ Restaurant Recommendations")
-st.markdown("Get AI-powered restaurant suggestions based on location, budget, and preferences.")
+# Header first (inline styles = always visible on Cloud)
+st.markdown(ZOMATO_HEADER, unsafe_allow_html=True)
+st.markdown(ZOMATO_CSS, unsafe_allow_html=True)
 
-db_path = PROJECT_ROOT / "data" / "processed" / "restaurants.db"
+# If you see "ZOMATO" in red above and form below (no sidebar), this is the new UI.
+db_path = PROJECT_ROOT / "data" / "processed" / "restaurants.db" / "data" / "processed" / "restaurants.db"
 places_list = get_places(db_path) if db_path.exists() else []
 place_options = [""] + (places_list if places_list else (["(Run Phase 1 ingestion first)"] if not db_path.exists() else []))
 
-with st.sidebar:
-    st.header("Filters")
-    place = st.selectbox(
-        "Location / Area",
-        options=place_options,
-        index=0,
-        help="Select city or locality",
-    )
-    min_price = st.number_input("Min price (₹ for two)", min_value=0, value=0, step=100)
+# Form in main area (same order as local UI: PLACE, MAX PRICE, MIN RATING, CUISINES, MAX RESULTS)
+place = st.selectbox(
+    "PLACE",
+    options=place_options,
+    index=0,
+    placeholder="Select areas",
+    help="Select city or locality",
+)
+
+col1, col2 = st.columns(2)
+with col1:
     max_price_val = st.number_input(
-        "Max price (₹ for two)",
+        "MAX PRICE (INR)",
         min_value=0,
         value=0,
         step=500,
+        placeholder="No max",
         help="Leave 0 for no maximum",
     )
-    max_price = 999999 if max_price_val == 0 else max_price_val
-    min_rating = st.slider("Minimum rating", 0.0, 5.0, 4.0, 0.1)
-    cuisines_text = st.text_input(
-        "Cuisines (comma-separated)",
-        placeholder="e.g. North Indian, Chinese",
+max_price = 999999 if max_price_val == 0 else max_price_val
+
+with col2:
+    min_rating = st.number_input(
+        "MIN RATING",
+        min_value=0.0,
+        max_value=5.0,
+        value=4.0,
+        step=0.1,
+        format="%.1f",
     )
-    cuisines = [c.strip() for c in (cuisines_text or "").split(",") if c.strip()]
-    max_results = st.number_input("Max results", min_value=1, max_value=50, value=10)
-    use_llm = st.checkbox("Use LLM (Groq)", value=True, help="Uncheck for template-only explanations")
-    submitted = st.button("Get recommendations")
+
+cuisines_text = st.text_input(
+    "CUISINES",
+    placeholder="Select cuisines (e.g. North Indian, Chinese)",
+)
+cuisines = [c.strip() for c in (cuisines_text or "").split(",") if c.strip()]
+
+max_results = st.number_input("MAX RESULTS", min_value=1, max_value=50, value=10)
+
+use_llm = st.checkbox("Use LLM (Groq) for explanations", value=True, help="Uncheck for template-only explanations")
+
+submitted = st.button("Get AI Recommendations")
 
 if submitted:
     if not db_path.exists():
@@ -119,7 +164,7 @@ if submitted:
             try:
                 data = run_recommendations(
                     place=place or (places_list[0] if places_list else ""),
-                    min_price=min_price,
+                    min_price=0,
                     max_price=max_price,
                     min_rating=min_rating,
                     cuisines=cuisines,
@@ -153,12 +198,12 @@ if submitted:
                 with st.container():
                     st.markdown(f"### {name}")
                     st.caption(f"📍 {loc}" if loc else "—")
-                    col1, col2, col3 = st.columns(3)
-                    with col1:
+                    c1, c2, c3 = st.columns(3)
+                    with c1:
                         st.metric("₹ for two", cost)
-                    with col2:
+                    with c2:
                         st.metric("Rating", f"★ {rating}")
-                    with col3:
+                    with c3:
                         st.markdown(" ".join(f"`{b}`" for b in badges) if badges else "—")
                     if cuisines_display:
                         st.markdown("**Cuisines:** " + ", ".join(cuisines_display[:6]))
@@ -170,6 +215,3 @@ if submitted:
                         st.markdown(f"**Address:** {address}")
                     st.button("Book a table", key=f"book_{r.get('candidate_id', id(r))}")
                     st.divider()
-
-else:
-    st.info("Use the sidebar to set location and filters, then click **Get recommendations**.")

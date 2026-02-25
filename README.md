@@ -48,4 +48,11 @@ If unset, the app uses template explanations and Phase 3 order.
 - `phase5/` — FastAPI + static HTML UI
 - `streamlit_app.py` — Streamlit UI (runs Phase 2–4 in-process)
 
-See **ARCHITECTURE.md** for full design and deployment notes (including Streamlit Community Cloud).
+### Deploy on Streamlit Community Cloud
+
+1. Push the latest code (including `.streamlit/config.toml` and `streamlit_app.py`) to GitHub.
+2. At [share.streamlit.io](https://share.streamlit.io), click **New app** → choose repo `deepanjandhwani/first-genAI-project`, branch `main`, main file path **`streamlit_app.py`**.
+3. Click **Deploy**. You should see the red **ZOMATO** header and **AI Restaurant Recommendation Platform** form.
+4. If you still see the old UI: in the app’s **Manage app** → **Reboot app**, or confirm the correct branch and that the repo is public. Add `GROQ_API_KEY` in **Secrets** if you use the LLM.
+
+See **ARCHITECTURE.md** for full design and deployment notes.
