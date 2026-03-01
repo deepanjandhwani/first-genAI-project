@@ -1,9 +1,8 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
+    { "source": "/", "destination": "/index.html" },
     { "source": "/recommendations/places", "destination": "/api/places" },
     { "source": "/recommendations/query", "destination": "/api/query" }
-  ],
-  "functions": {
-    "api/*.py": { "runtime": "python3.12" }
-  }
+  ]
 }

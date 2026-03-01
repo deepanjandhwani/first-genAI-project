@@ -145,14 +145,28 @@ def create_app(
 ):
     """Create FastAPI app with recommendations router mounted."""
     from fastapi import FastAPI
+    from fastapi.middleware.cors import CORSMiddleware
     from fastapi.responses import HTMLResponse, RedirectResponse
     from fastapi.staticfiles import StaticFiles
 
     app = FastAPI(title="Restaurant Recommendation API", version="1.0")
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     project_root = Path(__file__).resolve().parents[2]
     frontend_next_out = project_root / "frontend-next" / "out"
+    frontend_next_app = frontend_next_out / "app"  # Next export with basePath /app
     frontend_dist = project_root / "frontend" / "dist"
-    ui_dir = frontend_next_out if (frontend_next_out / "index.html").exists() else frontend_dist
+    if (frontend_next_app / "index.html").exists():
+        ui_dir = frontend_next_app
+    elif (frontend_next_out / "index.html").exists():
+        ui_dir = frontend_next_out
+    else:
+        ui_dir = frontend_dist
 
     @app.get("/")
     def root():

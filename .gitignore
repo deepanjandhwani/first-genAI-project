@@ -21,4 +21,6 @@ env/
 
 # Optional: uncomment to avoid committing large DBs
 # data/processed/*.db
-# data/raw/
+data/raw/
+.vercel
+.env*.local

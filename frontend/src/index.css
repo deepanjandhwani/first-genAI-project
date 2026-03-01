@@ -1,0 +1,25 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --zomato-red: #e23744;
+  --zomato-red-dark: #c42f3a;
+  --bg: #f5f4f2;
+  --card: #ffffff;
+  --text: #1c1c1c;
+  --text-muted: #6b6b6b;
+  --border: #e8e8e8;
+}
+
+body {
+  margin: 0;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}

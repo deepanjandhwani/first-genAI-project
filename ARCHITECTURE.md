@@ -541,21 +541,11 @@ These JSON shapes describe the main interfaces used between phases. They are con
 
 ## 6. Running the application
 
-### Streamlit (recommended for deployment)
+### Vercel (production)
 
-A single-page Streamlit app runs the full pipeline (Phase 2 → 3 → 4) without a separate API server:
+The app is deployed on Vercel: static UI in `public/index.html` and serverless API in `api/` (FastAPI). See **DEPLOY_VERCEL.md**.
 
-```bash
-pip install -r requirements.txt
-streamlit run streamlit_app.py
-```
-
-- **Location**: project root `streamlit_app.py`.
-- **Config**: `.env` in project root for `GROQ_API_KEY` (optional; fallback to template explanations if unset).
-- **Data**: expects `data/processed/restaurants.db` (run Phase 1 ingestion first).
-- **Deploy**: e.g. Streamlit Community Cloud by connecting the repo and setting run command to `streamlit run streamlit_app.py`.
-
-### FastAPI + static HTML
+### FastAPI + static HTML (local)
 
 ```bash
 uvicorn phase5.display.api:create_app --factory

@@ -15,15 +15,7 @@ AI-powered restaurant recommendations (Zomato-style): Phase 1 ingestion from Hug
    ```
    Creates `data/processed/restaurants.db`.
 
-3. **Run the app**
-
-   **Option A — Streamlit (deploy-friendly)**
-   ```bash
-   streamlit run streamlit_app.py
-   ```
-   Open the URL in the browser. Use the sidebar to set location, price, rating, cuisines, then **Get recommendations**.
-
-   **Option B — FastAPI + HTML**
+3. **Run the app locally** (optional; production is on Vercel)
    ```bash
    uvicorn phase5.display.api:create_app --factory
    ```
@@ -45,21 +37,14 @@ If unset, the app uses template explanations and Phase 3 order.
 - `phase2/` — Preference validation and normalization
 - `phase3/` — Filter + rank engine (SQLite)
 - `phase4/` — LLM orchestrator (Groq) and fallback
-- `phase5/` — FastAPI + static HTML UI
-- `streamlit_app.py` — Streamlit UI (runs Phase 2–4 in-process)
-
-### Deploy on Streamlit Community Cloud
-
-1. Push the latest code (including `.streamlit/config.toml` and `streamlit_app.py`) to GitHub.
-2. At [share.streamlit.io](https://share.streamlit.io), click **New app** → choose repo `deepanjandhwani/first-genAI-project`, branch `main`, main file path **`streamlit_app.py`**.
-3. Click **Deploy**. You should see the red **ZOMATO** header and **AI Restaurant Recommendation Platform** form.
-4. If you still see the old UI: in the app’s **Manage app** → **Reboot app**, or confirm the correct branch and that the repo is public. Add `GROQ_API_KEY` in **Secrets** if you use the LLM.
+- `phase5/` — FastAPI + static HTML UI (local)
+- `api/` — Vercel serverless API (places + query)
 
 ### Deploy on Vercel
 
 Static UI + Python serverless API. See **DEPLOY_VERCEL.md** for full steps. Summary:
 
-- **UI**: `public/index.html` (same as local Zomato UI). **API**: `api/places.py`, `api/query.py` (rewrites map `/recommendations/*` to `/api/*`).
+- **UI**: `public/index.html` (same as local Zomato UI). **API**: `api/index.py` (FastAPI app); rewrites map `/recommendations/*` to `/api/*`.
 - Run Phase 1 locally, then **commit** `data/processed/restaurants.db` (do not add it to `.gitignore`) so Vercel has the DB.
 - In Vercel: set **`GROQ_API_KEY`** in Environment Variables for LLM.
 - Deploy: `vercel` from the project root, or connect the repo at [vercel.com](https://vercel.com).

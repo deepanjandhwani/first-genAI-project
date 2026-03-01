@@ -1,12 +1,11 @@
-# Keep serverless bundle smaller; static UI and API code are still deployed
+# Keep serverless bundle under Vercel's 100 MB limit
+data
 frontend-next
 frontend
 *.pyc
 __pycache__
 .pytest_cache
 .git
-.streamlit
-streamlit_app.py
 tests
 *.md
 !README.md

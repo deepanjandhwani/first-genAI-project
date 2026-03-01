@@ -1,8 +1,0 @@
-# Zomato-style: red accent, light background (matches local UI)
-[theme]
-primaryColor = "#e23744"
-backgroundColor = "#fafafa"
-secondaryBackgroundColor = "#ffffff"
-
-[browser]
-gatherUsageStats = false
